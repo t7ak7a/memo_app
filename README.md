@@ -1,0 +1,2 @@
+htmlはGitHubPage用
+phpはPC環境から再構築する
