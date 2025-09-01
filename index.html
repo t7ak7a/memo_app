@@ -3,360 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memot - JS Version with Google Calendar</title>
-<style>
-/* CSSは変更ありません */
-body {
-    margin: 0;
-    background-color: #fffaf2;
-    font-family: sans-serif;
-}
-
-.appbar {
-    background-color: #84bed6;
-    color: #fff;
-    padding: 12px;
-    text-align: center;
-    margin-bottom: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.8);
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.container {
-    padding: 10px;
-}
-
-/* --- 一覧画面 --- */
-.memo-list {
-    padding-top: 5px;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-}
-
-.memo-list-item {
-   background-color: #ffffff;
-   padding: 12px;
-   border-bottom: 1px solid #e0e0e0;
-   transition: background-color 0.2s;
-}
-.memo-list-item:hover {
-    background-color: #f5f5f5;
-}
-
-.memo-list-item h3 {
-   font-size: 18px;
-   margin: 0 0 4px 0;
-}
-
-.memo-list-item p {
-    font-size: 11px;
-    color: gray;
-    margin: 0;
-}
-
-.memo-add-button {
-    width: 50px;
-    height: 50px;
-    background-color: palevioletred;
-    color: #fff;
-    font-size: 24px;
-    text-align: center;
-    line-height: 48px;
-    border-radius: 50px;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-    transition: transform 0.2s;
-}
-.memo-add-button:hover {
-    transform: scale(1.1);
-}
-
-/* --- 編集画面 --- */
-#edit-view {
-    display: none;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-.form-control {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-textarea.form-control {
-    height: 150px;
-    resize: vertical;
-}
-.datetime-group {
-    display: flex;
-    gap: 10px;
-}
-.datetime-group .form-group {
-    flex: 1;
-}
-
-.button-container {
-    margin-top: 20px;
-}
-
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-}
-.btn-primary {
-    background-color: #3498db;
-}
-.btn-primary:hover {
-    background-color: #2980b9;
-}
-.btn-danger {
-    background-color: #e74c3c;
-}
-.btn-danger:hover {
-    background-color: #c0392b;
-}
-.btn-secondary {
-    background-color: #2ecc71;
-    width: 100%;
-    box-sizing: border-box;
-}
-.btn-secondary:hover {
-    background-color: #27ae60;
-}
-
-
-.back-link {
-    display: inline-block;
-    margin-top: 15px;
-    color: #3498db;
-}
-
-</style>
+    <title>Two-Level Memot</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="appbar">
-        Memot
-    </div>
-
-    <div id="list-view">
-        <div class="memo-list" id="memo-list-container"></div>
-        <a id="memo-add-button" class="memo-add-button">＋</a>
-    </div>
-
-    <div id="edit-view" class="container">
-        <form id="memo-form">
-            <input type="hidden" id="memo-id" name="id">
-            
-            <div class="form-group">
-                <label for="memo-title">タイトル</label>
-                <input type="text" id="memo-title" name="title" class="form-control" required>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>ノートブック</h2>
+                <button id="add-notebook-btn" class="add-btn">＋</button>
             </div>
+            <ul id="notebook-list" class="list"></ul>
             
-            <div class="datetime-group">
-                <div class="form-group">
-                    <label for="memo-start-time">開始日時</label>
-                    <input type="datetime-local" id="memo-start-time" class="form-control">
+            <div id="memo-list-container" class="memo-list-view" style="display: none;">
+                <div class="sidebar-header">
+                    <button id="back-to-notebooks-btn" class="back-btn">&larr;</button>
+                    <h3 id="current-notebook-title"></h3>
+                    <button id="add-memo-btn" class="add-btn">＋</button>
                 </div>
-                <div class="form-group">
-                    <label for="memo-end-time">終了日時</label>
-                    <input type="datetime-local" id="memo-end-time" class="form-control">
+                <ul id="memo-list" class="list"></ul>
+            </div>
+        </div>
+
+        <div class="main-content" id="edit-view" style="display: none;">
+            <div class="edit-toolbar">
+                <button id="back-to-list-btn" class="back-btn">&larr; メモ一覧へ</button>
+                <div class="toolbar-right">
+                    <button id="delete-memo-btn" class="delete-btn" style="display: none;">削除</button>
+                    <button id="save-memo-btn" class="save-btn">保存</button>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="memo-content">内容</label>
-                <textarea id="memo-content" name="content" class="form-control"></textarea>
+            <div class="editor-area">
+                <input type="text" id="memo-title" placeholder="タイトル" class="title-input">
+                <textarea id="memo-content" placeholder="メモの内容" class="content-textarea"></textarea>
             </div>
+        </div>
 
-            <div class="button-container">
-                <button type="button" id="add-to-calendar-button" class="btn btn-secondary">
-                    Googleカレンダーに追加
-                </button>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">メモを保存</button>
-                    <button type="button" id="delete-button" class="btn btn-danger">削除</button>
-                </div>
+        <div class="main-content" id="welcome-view">
+            <div class="welcome-message">
+                <h1>メモを選択してください</h1>
+                <p>左側のノートブックから始めましょう。</p>
             </div>
-        </form>
-
-        <a id="back-to-list-link" class="back-link">&laquo; 一覧に戻る</a>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // DOM要素の取得 (変更なし)
-            const listView = document.getElementById('list-view');
-            const editView = document.getElementById('edit-view');
-            const memoListContainer = document.getElementById('memo-list-container');
-            const memoAddButton = document.getElementById('memo-add-button');
-            const backToListLink = document.getElementById('back-to-list-link');
-            const memoForm = document.getElementById('memo-form');
-            const memoIdInput = document.getElementById('memo-id');
-            const memoTitleInput = document.getElementById('memo-title');
-            const memoContentInput = document.getElementById('memo-content');
-            const deleteButton = document.getElementById('delete-button');
-            const memoStartTimeInput = document.getElementById('memo-start-time');
-            const memoEndTimeInput = document.getElementById('memo-end-time');
-            const addToCalendarButton = document.getElementById('add-to-calendar-button');
-
-            const STORAGE_KEY = 'memot_memos';
-
-            // データ処理関数 (変更なし)
-            function getMemos() {
-                const memosJSON = localStorage.getItem(STORAGE_KEY);
-                return memosJSON ? JSON.parse(memosJSON) : [];
-            }
-
-            function saveMemos(memos) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
-            }
-
-            // 表示切り替え & データ描画 (変更なし)
-            function renderMemoList() {
-                const memos = getMemos();
-                memos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-                memoListContainer.innerHTML = '';
-                if (memos.length === 0) {
-                    memoListContainer.innerHTML = '<p style="text-align: center; color: gray; margin-top: 20px;">メモはまだありません。<br>右下の「＋」ボタンから作成しましょう。</p>';
-                } else {
-                    memos.forEach(memo => {
-                        const memoItemLink = document.createElement('a');
-                        memoItemLink.innerHTML = `<div class="memo-list-item"><h3></h3><p></p></div>`;
-                        memoItemLink.querySelector('h3').textContent = memo.title;
-                        memoItemLink.querySelector('p').textContent = new Date(memo.updated_at).toLocaleString('ja-JP');
-                        memoItemLink.addEventListener('click', () => showEditView(memo.id));
-                        memoListContainer.appendChild(memoItemLink);
-                    });
-                }
-            }
-            
-            function showListView() {
-                editView.style.display = 'none';
-                listView.style.display = 'block';
-                renderMemoList();
-            }
-            
-            function showEditView(id) {
-                listView.style.display = 'none';
-                editView.style.display = 'block';
-                if (id) {
-                    const memos = getMemos();
-                    const memo = memos.find(m => m.id === id);
-                    if (memo) {
-                        memoIdInput.value = memo.id;
-                        memoTitleInput.value = memo.title;
-                        memoContentInput.value = memo.content;
-                        memoStartTimeInput.value = memo.start_time || '';
-                        memoEndTimeInput.value = memo.end_time || '';
-                        deleteButton.style.display = 'inline-block';
-                    }
-                } else {
-                    memoForm.reset();
-                    memoIdInput.value = '';
-                    const now = new Date();
-                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                    memoStartTimeInput.value = now.toISOString().slice(0, 16);
-                    deleteButton.style.display = 'none';
-                }
-            }
-
-            // メモ保存・削除のイベントリスナー (変更なし)
-            memoForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const id = memoIdInput.value;
-                const memos = getMemos();
-                const memoData = {
-                    title: memoTitleInput.value,
-                    content: memoContentInput.value,
-                    start_time: memoStartTimeInput.value,
-                    end_time: memoEndTimeInput.value,
-                    updated_at: new Date().toISOString()
-                };
-                if (id) {
-                    const index = memos.findIndex(m => m.id === id);
-                    if (index !== -1) {
-                        memos[index] = { ...memos[index], ...memoData };
-                    }
-                } else {
-                    memos.push({ id: Date.now().toString(), ...memoData });
-                }
-                saveMemos(memos);
-                showListView();
-            });
-
-            deleteButton.addEventListener('click', () => {
-                const id = memoIdInput.value;
-                if (id && confirm('本当にこのメモを削除しますか？')) {
-                    let memos = getMemos();
-                    memos = memos.filter(m => m.id !== id);
-                    saveMemos(memos);
-                    showListView();
-                }
-            });
-
-            // ★★★ Googleカレンダーに追加ボタンの処理を再修正 ★★★
-            addToCalendarButton.addEventListener('click', () => {
-                const title = memoTitleInput.value;
-                const startTime = memoStartTimeInput.value;
-                const endTime = memoEndTimeInput.value;
-                const details = memoContentInput.value;
-                
-                if (!title || !startTime || !endTime) {
-                    alert('タイトル、開始日時、終了日時を入力してください。');
-                    return;
-                }
-
-                const formatGoogleDate = (dateString) => {
-                    // 日付フォーマットの調整 (ハイフン、コロン、Tを除去し、秒を追加)
-                    return dateString.replace(/[-:T]/g, '') + '00';
-                };
-
-                const googleStartTime = formatGoogleDate(startTime);
-                const googleEndTime = formatGoogleDate(endTime);
-
-                // ★★★ 修正点: URLSearchParamsを使わず、手動でURLを組み立てる ★★★
-                const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(title)}&dates=${googleStartTime}/${googleEndTime}&details=${encodeURIComponent(details)}`;
-
-                window.open(calendarUrl, '_blank');
-            });
-
-            // その他のイベントリスナー (変更なし)
-            memoAddButton.addEventListener('click', () => showEditView(null));
-            backToListLink.addEventListener('click', showListView);
-
-            // 初期化 (変更なし)
-            showListView();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
