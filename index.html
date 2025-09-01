@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memot - JS Version</title>
+<style>
+/* CSSは元のスタイルをそのまま利用します */
+body {
+    margin: 0;
+    background-color: #fffaf2;
+    font-family: sans-serif;
+}
+
+.appbar {
+    background-color: #84bed6;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+    margin-bottom: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 10px;
+}
+
+/* --- 一覧画面 --- */
+.memo-list {
+    padding-top: 5px;
+}
+
+/* aタグのデフォルトスタイルをリセット */
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.memo-list-item {
+   background-color: #ffffff;
+   padding: 12px;
+   border-bottom: 1px solid #e0e0e0;
+   transition: background-color 0.2s;
+}
+.memo-list-item:hover {
+    background-color: #f5f5f5;
+}
+
+.memo-list-item h3 {
+   font-size: 18px;
+   margin: 0 0 4px 0;
+}
+
+.memo-list-item p {
+    font-size: 11px;
+    color: gray;
+    margin: 0;
+}
+
+.memo-add-button {
+    width: 50px;
+    height: 50px;
+    background-color: palevioletred;
+    color: #fff;
+    font-size: 24px;
+    text-align: center;
+    line-height: 48px;
+    border-radius: 50px;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+}
+.memo-add-button:hover {
+    transform: scale(1.1);
+}
+
+/* --- 編集画面 --- */
+#edit-view {
+    display: none; /* 初期状態では非表示 */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+textarea.form-control {
+    height: 250px;
+    resize: vertical;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-primary {
+    background-color: #3498db;
+}
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+.btn-danger {
+    background-color: #e74c3c;
+}
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #3498db;
+}
+
+</style>
+</head>
+<body>
+    <div class="appbar">
+        Memot
+    </div>
+
+    <div id="list-view">
+        <div class="memo-list" id="memo-list-container">
+            </div>
+        <a id="memo-add-button" class="memo-add-button">
+            ＋
+        </a>
+    </div>
+
+    <div id="edit-view" class="container">
+        <form id="memo-form">
+            <input type="hidden" id="memo-id" name="id">
+            
+            <div class="form-group">
+                <label for="memo-title">タイトル</label>
+                <input type="text" id="memo-title" name="title" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="memo-content">内容</label>
+                <textarea id="memo-content" name="content" class="form-control"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <button type="button" id="delete-button" class="btn btn-danger">削除</button>
+            </div>
+        </form>
+
+        <a id="back-to-list-link" class="back-link">&laquo; 一覧に戻る</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM要素の取得 ---
+            const listView = document.getElementById('list-view');
+            const editView = document.getElementById('edit-view');
+            const memoListContainer = document.getElementById('memo-list-container');
+            const memoAddButton = document.getElementById('memo-add-button');
+            const backToListLink = document.getElementById('back-to-list-link');
+            const memoForm = document.getElementById('memo-form');
+            const memoIdInput = document.getElementById('memo-id');
+            const memoTitleInput = document.getElementById('memo-title');
+            const memoContentInput = document.getElementById('memo-content');
+            const deleteButton = document.getElementById('delete-button');
+
+            // localStorageのキー
+            const STORAGE_KEY = 'memot_memos';
+
+            // --- データ処理関数 ---
+
+            /**
+             * localStorageから全てのメモを取得する
+             * @returns {Array} メモの配列
+             */
+            function getMemos() {
+                const memosJSON = localStorage.getItem(STORAGE_KEY);
+                return memosJSON ? JSON.parse(memosJSON) : [];
+            }
+
+            /**
+             * メモの配列をlocalStorageに保存する
+             * @param {Array} memos 保存するメモの配列
+             */
+            function saveMemos(memos) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
+            }
+
+            // --- 表示切り替え & データ描画 ---
+
+            /**
+             * メモ一覧を描画する
+             */
+            function renderMemoList() {
+                const memos = getMemos();
+                // 更新日時の降順でソート
+                memos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                
+                memoListContainer.innerHTML = ''; // 一旦リストを空にする
+
+                if (memos.length === 0) {
+                    memoListContainer.innerHTML = '<p style="text-align: center; color: gray; margin-top: 20px;">メモはまだありません。<br>右下の「＋」ボタンから作成しましょう。</p>';
+                } else {
+                    memos.forEach(memo => {
+                        const memoItemLink = document.createElement('a');
+                        
+                        // メモアイテムのHTMLを生成
+                        memoItemLink.innerHTML = `
+                            <div class="memo-list-item">
+                                <h3></h3> 
+                                <p></p>
+                            </div>
+                        `;
+                        // テキストはtextContentで安全に設定
+                        memoItemLink.querySelector('h3').textContent = memo.title;
+                        memoItemLink.querySelector('p').textContent = new Date(memo.updated_at).toLocaleString('ja-JP');
+                        
+                        // クリックされたら編集画面を表示するイベントを追加
+                        memoItemLink.addEventListener('click', () => showEditView(memo.id));
+
+                        memoListContainer.appendChild(memoItemLink);
+                    });
+                }
+            }
+            
+            /**
+             * 一覧画面を表示する
+             */
+            function showListView() {
+                editView.style.display = 'none';
+                listView.style.display = 'block';
+                renderMemoList();
+            }
+            
+            /**
+             * 編集画面を表示する
+             * @param {string|null} id 編集するメモのID。新規作成の場合はnull
+             */
+            function showEditView(id) {
+                listView.style.display = 'none';
+                editView.style.display = 'block';
+                
+                if (id) { // 編集の場合
+                    const memos = getMemos();
+                    const memo = memos.find(m => m.id === id);
+                    if (memo) {
+                        memoIdInput.value = memo.id;
+                        memoTitleInput.value = memo.title;
+                        memoContentInput.value = memo.content;
+                        deleteButton.style.display = 'inline-block'; // 削除ボタン表示
+                    }
+                } else { // 新規作成の場合
+                    memoForm.reset(); // フォームをリセット
+                    memoIdInput.value = ''; // IDを空に
+                    deleteButton.style.display = 'none'; // 削除ボタン非表示
+                }
+            }
+
+            // --- イベントリスナーの設定 ---
+
+            // [保存] フォーム送信時の処理
+            memoForm.addEventListener('submit', (e) => {
+                e.preventDefault(); // デフォルトのフォーム送信をキャンセル
+
+                const id = memoIdInput.value;
+                const title = memoTitleInput.value;
+                const content = memoContentInput.value;
+                const memos = getMemos();
+
+                if (id) { // 更新
+                    const memo = memos.find(m => m.id === id);
+                    if (memo) {
+                        memo.title = title;
+                        memo.content = content;
+                        memo.updated_at = new Date().toISOString();
+                    }
+                } else { // 新規作成
+                    const newMemo = {
+                        id: Date.now().toString(), // IDとして現在時刻のタイムスタンプを使用
+                        title: title,
+                        content: content,
+                        updated_at: new Date().toISOString()
+                    };
+                    memos.push(newMemo);
+                }
+                saveMemos(memos);
+                showListView();
+            });
+
+            // [削除] ボタンクリック時の処理
+            deleteButton.addEventListener('click', () => {
+                const id = memoIdInput.value;
+                if (id && confirm('本当にこのメモを削除しますか？')) {
+                    let memos = getMemos();
+                    memos = memos.filter(m => m.id !== id);
+                    saveMemos(memos);
+                    showListView();
+                }
+            });
+
+            // [+] ボタンクリック時の処理
+            memoAddButton.addEventListener('click', () => showEditView(null));
+
+            // [一覧に戻る] リンククリック時の処理
+            backToListLink.addEventListener('click', showListView);
+
+            // --- 初期化 ---
+            showListView(); // 最初に一覧画面を表示
+        });
+    </script>
+</body>
+</html>
