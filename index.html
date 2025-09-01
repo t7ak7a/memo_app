@@ -324,7 +324,7 @@ textarea.form-control {
                 }
             });
 
-            // ★★★ Googleカレンダーに追加ボタンの処理を修正 ★★★
+            // ★★★ Googleカレンダーに追加ボタンの処理を再修正 ★★★
             addToCalendarButton.addEventListener('click', () => {
                 const title = memoTitleInput.value;
                 const startTime = memoStartTimeInput.value;
@@ -336,22 +336,16 @@ textarea.form-control {
                     return;
                 }
 
-                // ★★★ 修正点: 日時変換処理をより堅牢なものに変更 ★★★
-                // YYYY-MM-DDTHH:MM -> YYYYMMDDTHHMM00
                 const formatGoogleDate = (dateString) => {
+                    // 日付フォーマットの調整 (ハイフン、コロン、Tを除去し、秒を追加)
                     return dateString.replace(/[-:T]/g, '') + '00';
                 };
 
                 const googleStartTime = formatGoogleDate(startTime);
                 const googleEndTime = formatGoogleDate(endTime);
 
-                const params = new URLSearchParams();
-                params.append('text', title);
-                params.append('dates', `${googleStartTime}/${googleEndTime}`);
-                params.append('details', details);
-                
-                // ★★★ 修正点: Googleカレンダーの新しいURL形式を使用 ★★★
-                const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?${params.toString()}`;
+                // ★★★ 修正点: URLSearchParamsを使わず、手動でURLを組み立てる ★★★
+                const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(title)}&dates=${googleStartTime}/${googleEndTime}&details=${encodeURIComponent(details)}`;
 
                 window.open(calendarUrl, '_blank');
             });
