@@ -1,53 +1,35 @@
-/* Sidebar: 左メニュー */
-.sidebar {
-  display: flex; /* Flexboxを有効にして、子要素を柔軟に配置します。 */
-  flex-direction: column; /* 要素を上から下へ縦に並べます。 */
-  height: 100vh; /* ビューポートの高さに合わせて、メニューの高さをいっぱいにします。 */
-  position: fixed; /* 画面にメニューを固定し、スクロールしても動かないようにします。 */
-  top: 0;
-  left: 0;
-  width: 250px; /* メニューの幅を調整してください。 */
-  background-color: #f8f9fa; /* 背景色 */
-  overflow-y: auto; /* メニュー項目が多くてもスクロール可能にします。 */
+/* 左メニュー全体 */
+.left-sidebar {
+  /* ... その他のスタイル ... */
+  display: flex; /* Flexboxを有効にする */
+  flex-direction: column; /* 垂直方向に要素を並べる */
+  height: 100vh; /* 画面いっぱいの高さを確保 */
 }
 
-/* メモリスト: メニュー項目 */
-.memo-list {
-  flex-grow: 1; /* 残りのスペースをすべて占有し、ボタンを最下部に押し下げます。 */
-  overflow-y: auto; /* メモリスト自体がスクロール可能になります。 */
-  padding-bottom: 20px; /* ボタンとの間に適切な余白を追加します。 */
+/* メニューリスト */
+.menu-list {
+  /* ... その他のスタイル ... */
+  flex-grow: 1; /* メニューリストが残りのスペースをすべて占めるようにする */
 }
 
 /* プラスボタン */
 .add-button {
-  width: 100%; /* 親要素の幅いっぱいに広げます。 */
-  padding: 15px 0; /* 上下のパディングを調整してボタンの高さを設定します。 */
-  font-size: 1.2rem; /* フォントサイズを調整します。 */
-  white-space: nowrap; /* テキストが改行されないようにします。 */
-  text-align: center;
-  background-color: #007bff; /* ボタンの色を調整してください。 */
-  color: white; /* テキストの色 */
+  width: 100%; /* 親要素の幅いっぱいに広げる */
+  padding: 10px; /* パディングでサイズを調整 */
+  position: sticky; /* スクロールしても位置を固定 */
+  bottom: 0; /* 親要素の一番下に配置 */
+  background-color: #f0f0f0; /* 背景色を設定 */
   border: none;
-  cursor: pointer;
-  /* ボタンをメニューの最下部に固定します。 */
-  position: sticky;
-  bottom: 0;
-  left: 0;
+  text-align: center;
+  /* 文字のサイズ調整 */
+  font-size: 16px;
+  white-space: nowrap; /* テキストの改行を防ぐ */
 }
 
-/* レスポンシブデザイン: スマートフォン */
+/* スマートフォン向けのレスポンシブ対応 */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 100%; /* スマートフォンではメニューを全幅にします。 */
-    height: auto;
-    position: static; /* 固定を解除して通常配置にします。 */
-    /* モバイルでの見せ方を調整してください。 */
-  }
-
   .add-button {
-    font-size: 1rem;
-    padding: 12px 0;
-    /* スマートフォンではボタンを固定する代わりに、メニューの最後に配置します。 */
-    position: static;
+    /* スマートフォン向けにパディングを調整するなど */
+    padding: 15px;
   }
 }
