@@ -1,35 +1,89 @@
-/* 左メニュー全体 */
-.left-sidebar {
-  /* ... その他のスタイル ... */
-  display: flex; /* Flexboxを有効にする */
-  flex-direction: column; /* 垂直方向に要素を並べる */
-  height: 100vh; /* 画面いっぱいの高さを確保 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f1f3f4;
+    margin: 0;
+    padding: 20px;
 }
 
-/* メニューリスト */
-.menu-list {
-  /* ... その他のスタイル ... */
-  flex-grow: 1; /* メニューリストが残りのスペースをすべて占めるようにする */
+.app-container {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-/* プラスボタン */
-.add-button {
-  width: 100%; /* 親要素の幅いっぱいに広げる */
-  padding: 10px; /* パディングでサイズを調整 */
-  position: sticky; /* スクロールしても位置を固定 */
-  bottom: 0; /* 親要素の一番下に配置 */
-  background-color: #f0f0f0; /* 背景色を設定 */
-  border: none;
-  text-align: center;
-  /* 文字のサイズ調整 */
-  font-size: 16px;
-  white-space: nowrap; /* テキストの改行を防ぐ */
+h1 {
+    text-align: center;
+    color: #5f6368;
 }
 
-/* スマートフォン向けのレスポンシブ対応 */
-@media (max-width: 768px) {
-  .add-button {
-    /* スマートフォン向けにパディングを調整するなど */
+/* メモ追加エリア */
+.note-input-area {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     padding: 15px;
-  }
+    margin-bottom: 20px;
+}
+
+#note-text {
+    width: 100%;
+    border: none;
+    resize: none;
+    font-size: 16px;
+    padding: 10px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#add-note-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#add-note-btn:hover {
+    background-color: #357ae8;
+}
+
+/* メモ表示エリア */
+.notes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+/* 個々のメモカード */
+.note-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 15px;
+    position: relative;
+}
+
+.note-card p {
+    margin: 0;
+    white-space: pre-wrap; /* 改行を保持 */
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #aaa;
+    display: none; /* ホバー時に表示 */
+}
+
+.note-card:hover .delete-btn {
+    display: block;
 }
