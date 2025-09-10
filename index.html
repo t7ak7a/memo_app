@@ -3,50 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two-Level Memot</title>
+    <title>メモアプリ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>ノートブック</h2>
-                <button id="add-notebook-btn" class="add-btn">＋</button>
-            </div>
-            <ul id="notebook-list" class="list"></ul>
-            
-            <div id="memo-list-container" class="memo-list-view" style="display: none;">
-                <div class="sidebar-header">
-                    <button id="back-to-notebooks-btn" class="back-btn">&larr;</button>
-                    <h3 id="current-notebook-title"></h3>
-                    <button id="add-memo-btn" class="add-btn">＋</button>
-                </div>
-                <ul id="memo-list" class="list"></ul>
-            </div>
+        <h1>メモアプリ</h1>
+
+        <div class="note-input-area">
+            <textarea id="note-text" placeholder="ここに新しいメモを入力..."></textarea>
+            <button id="add-note-btn">メモを追加</button>
         </div>
 
-        <div class="main-content" id="edit-view" style="display: none;">
-            <div class="edit-toolbar">
-                <button id="back-to-list-btn" class="back-btn">&larr; メモ一覧へ</button>
-                <div class="toolbar-right">
-                    <button id="delete-memo-btn" class="delete-btn" style="display: none;">削除</button>
-                    <button id="save-memo-btn" class="save-btn">保存</button>
-                </div>
+        <div class="notes-container" id="notes-container">
             </div>
-            <div class="editor-area">
-                <input type="text" id="memo-title" placeholder="タイトル" class="title-input">
-                <textarea id="memo-content" placeholder="メモの内容" class="content-textarea"></textarea>
-            </div>
-        </div>
-
-        <div class="main-content" id="welcome-view">
-            <div class="welcome-message">
-                <h1>メモを選択してください</h1>
-                <p>左側のノートブックから始めましょう。</p>
-            </div>
-        </div>
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
